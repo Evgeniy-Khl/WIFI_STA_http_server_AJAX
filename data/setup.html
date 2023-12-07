@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>ESP Input Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+   <style>
+	html {font-family: Arial; display: inline-block; text-align: center;}
+    h1 {
+  	  color: white;
+  	  text-align: center;
+	}
+	#grad1 {
+      height: 250px;
+      background-color: #9d9e9b; /* For browsers that do not support gradients */
+      background-image: linear-gradient(to bottom right, #585957, #db9951);
+    }
+    table, th, td {
+      margin: 0px auto;
+      border-collapse: collapse;
+    }
+
+	.button {
+	  display: inline-block;
+	  background-color: #008CBA;
+	  border: none;
+	  border-radius: 4px;
+	  color: white;
+	  padding: 16px 40px;
+	  text-decoration: none;
+	  font-size: 30px;
+	  margin: 2px;
+	  cursor: pointer;
+	}
+  </style>
+ </head>
+ <body>
+  <div id="grad1">
+  <h1>ESP8266 Установки</h1>
+<!------------------------------------------------------------->
+  <form action="/get" target="hidden-form">
+    SetUp1 (значение %inputString%): <input type="text" name="SetUp1">
+    <input type="submit" value="Записать" onclick="submitMessage()">
+  </form><br>
+  <form action="/get" target="hidden-form">
+    SetUp2 (значение %inputInt%): <input type="number " name="SetUp2">
+    <input type="submit" value="Записать" onclick="submitMessage()">
+  </form><br>
+  <form action="/get" target="hidden-form">
+    SetUp3 (значение %inputFloat%): <input type="number " name="SetUp3">
+    <input type="submit" value="Записать" onclick="submitMessage()">
+  </form>
+  <iframe style="display:none" name="hidden-form"></iframe>
+<!--
+  <p></p>
+  <form action="/get" target="hidden-form">
+  <table>
+  <tr>
+    <th style="width:40%"></th>
+    <th>Текущее</th>
+    <th>Новое</th>
+  </tr>
+  <tr>
+    <td style="font-size:25px">Наименование1</td>
+    <td>%inputString%</td>
+    <td><input type="text" name="SetUp1"></td>
+    <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
+  </tr>
+  </table>
+  </form>
+  <iframe style="display:none" name="hidden-form"></iframe>
+
+  <form action="/get" target="hidden-form">
+  <table>
+  <tr>
+    <th style="width:40%"></th>
+    <th>Текущее</th>
+    <th>Новое</th>
+  </tr>
+  <tr>
+    <td style="font-size:25px">Наименование2</td>
+    <td>%inputString%</td>
+    <td><input type="number" name="SetUp2"></td>
+    <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
+  </tr>
+  </table>
+  </form>
+  <iframe style="display:none" name="hidden-form"></iframe>
+
+  <form action="/get" target="hidden-form">
+  <table>
+  <tr>
+    <th style="width:40%"></th>
+    <th>Текущее</th>
+    <th>Новое</th>
+  </tr>
+  <tr>
+    <td style="font-size:25px">Наименование3</td>
+    <td>%inputString%</td>
+    <td><input type="number" name="SetUp3"></td>
+    <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
+  </tr>
+  </table>
+  </form><br><br>
+  <iframe style="display:none" name="hidden-form"></iframe>
+<!------------------------------------------------------------->  
+  <p>
+    <a href="/"><button class="button">ВЫХОД</button></a>
+  </p>
+  </div>
+<script>
+	function submitMessage() {
+		alert("Saved value to ESP SPIFFS");
+		setTimeout(function(){ document.location.reload(false); }, 500);
+	}
+</script>
+</body>
+</html>

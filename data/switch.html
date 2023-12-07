@@ -1,0 +1,100 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    h1 {
+  	  color: white;
+  	  text-align: center;
+	}
+	#grad1 {
+      height: 830px;
+      background-color: #9d9e9b; /* For browsers that do not support gradients */
+      background-image: linear-gradient(to bottom right, #585957, #db9951);
+    }
+	.button {
+	  display: inline-block;
+	  background-color: #008CBA;
+	  border: none;
+	  border-radius: 4px;
+	  color: white;
+	  padding: 16px 40px;
+	  text-decoration: none;
+	  font-size: 30px;
+	  margin: 2px;
+	  cursor: pointer;
+	}
+    h2 {font-size: 3.0rem;}
+    p {font-size: 3.0rem;}
+    body {max-width: 600px; margin:0px auto; padding-bottom: 25px;}
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 34px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 68px}
+    input:checked+.slider {background-color: #2196F3}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+  </style>
+</head>
+<body>
+  <div id="grad1">
+  <h1>ПЕРЕКЛЮЧАТЕЛИ</h1>
+  <h4>НАГРЕВ (5)</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="rel1" name="gpio5" /><span class="slider"></span></label>
+  <h4>УВЛАЖНИТЕЛЬ (4)</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="rel2" name="gpio4" /><span class="slider"></span></label>
+  <h4>ВЕНТИЛЯТОР (14)</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="rel3" name="gpio14" /><span class="slider"></span></label>
+  <h4>ОСУШИТЕЛЬ (12)</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="rel4" name="gpio12" /><span class="slider"></span></label>
+  <h4>ОСВЕЩЕНИЕ (13)</h4><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="rel5" name="gpio13" /><span class="slider"></span></label>
+  <p>
+    <a href="/"><button class="button">ВЫХОД</button></a>
+  </p>
+  </div>
+<script>
+// Отримуємо кнопку та ініціалізуємо змінні
+		var GPIO_status = 0;
+		// Функція для отримання стану реле
+		function relay_state() {
+			var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+			for(var i=1;i<6;i++){
+				request.open("GET", "/status?relay="+i,false);	//выполнение СИНХРОННО
+				// Обробка відповіді сервера
+				request.onload = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						var response = request.responseText;
+						if (response == "-ON") {
+							switch (i) {
+								case 1: rel1.checked = true; break;
+								case 2: rel2.checked = true; break;
+								case 3: rel3.checked = true; break;
+								case 4: rel4.checked = true; break;
+								case 5: rel5.checked = true; break;
+								default :					break;
+							} 
+						}
+						else {
+							switch (i) {
+								case 1: rel1.checked = false; break;
+								case 2: rel2.checked = false; break;
+								case 3: rel3.checked = false; break;
+								case 4: rel4.checked = false; break;
+								case 5: rel5.checked = false; break;
+								default :					break;
+							}						
+						}
+					}
+				}
+				request.send();
+			}
+		}
+		
+		function toggleCheckbox(element) {
+		  var xhr = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+		  if(element.checked){ xhr.open("GET", "/update?relay="+element.id+"&state=1", false); }	//выполнение СИНХРОННО
+		  else { xhr.open("GET", "/update?relay="+element.id+"&state=0", false); }					//выполнение СИНХРОННО
+		  xhr.send();
+		}
+		// Отримання стану реле при завантаженні сторінки
+		document.addEventListener('DOMContentLoaded', relay_state);
+</script>
+</body>
+</html>

@@ -1,31 +1,223 @@
- <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<!-- 
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com  
+-->
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="icon" href="data:,">
-<title>ESP32 File Server</title>
-<script>
-  var xhr;
-  var idTimer1;
-  function onload(){
-    xhr = new(XMLHttpRequest);
-    xhr.open("POST", "color.html?start=0", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
+  <title>ESP8266 Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <!--link rel="stylesheet" type="text/css" href="style.css">
+  <!-- Стилі для елементів сторінки -->
+  <style>
+	html {
+	  font-family: Arial;
+	  display: inline-block;
+	  margin: 0px auto;
+	  text-align: center;
+	}
+    #grad1 {
+      height: 0px auto;
+      background-color: #9d9e9b; /* For browsers that do not support gradients */
+      background-image: linear-gradient(to bottom right, #585957, #db9951);
     }
-    xhr.send(null);
-    idTimer1 = setInterval("Timer1()", 10000);
-  }
-  
-  setInterval(function ( ) {
-    var xhttp = new XMLHttpRequest();			// XMLHttpRequest (XHR)- РѕР±'С”РєС‚ РґР»СЏ РІС–РґРїСЂР°РІРєРё С– РѕС‚СЂРёРјР°РЅРЅСЏ РґР°РЅРёС… Р· СЃРµСЂРІРµСЂР° Р±РµР· РїРµСЂРµР·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РІРµР±-СЃС‚РѕСЂС–РЅРєРё.
+    h1 {
+  	  color: white;
+  	  text-align: center;
+	}
+	p {
+	  font-size: 1.5rem;
+	}
+    #rcorners1 {
+      border-radius: 15px;
+      background: #f2bebb;
+      padding: 5px; 
+      width: 300px;
+      height: 0px auto;
+      margin: 0px auto;
+    }
+
+    #rcorners2 {
+      border-radius: 15px;
+      background: #bbdff2;
+      padding: 5px; 
+      width: 300px;
+      height: 0px auto;
+      margin: 0px auto;  
+    }
+    
+    #rcorners3 {
+      border-radius: 15px;
+      background: LightGray;
+      padding: 5px; 
+      width: 300px;
+      height: 0px auto;
+      margin: 0px auto;  
+    }
+   
+	.button {
+	  display: inline-block;
+	  background-color: #008CBA;
+	  border: none;
+	  border-radius: 4px;
+	  color: white;
+	  padding: 10px 10px;
+	  text-decoration: none;
+	  font-size: 30px;
+	  margin: 2px;
+	  cursor: pointer;
+	}
+	.button1 {
+	  background-color: #06bf34;
+	}
+	.button2 {
+	  background-color: #f44336;
+	}
+	.relayOff {
+	  background-color:LightGray;
+	  color: White;
+	  border: 4px;
+	  border-radius: 4px;
+      padding: 10px 40px;
+	  text-decoration: none;
+	  font-size: 25px;
+      width: 290px;
+	  margin: 2px;
+	}
+	.relayOn {
+	  background-color:Yellow;
+      border: 4px;
+	  border-radius: 4px;
+      padding: 10px 40px;
+	  text-decoration: none;
+	  font-size: 25px;
+      width: 290px;
+	  margin: 2px;
+	}
+	.units {
+	  font-size: 1.2rem;
+	 }
+	.sensor-labels {
+	  font-size: 1.5rem;
+	}
+  </style>
+</head>
+<body onload="onload()">
+  <div id="grad1">
+  <h1>ESP8266 Web Server</h1> 
+    <input type="button" id="rel0" value = "Stop" onclick="rel0_update()" class="relayOff" />
+  <p></p>
+  <p id="rcorners1">
+    <span class="sensor-labels">Температура</span><br/>
+    <span style="font-size:3.0em;" id="temperature">%TMP%</span>
+    <sup class="units">&deg;C</sup>
+  </p>
+  <p></p>
+  <p id="rcorners2">
+    <span class="sensor-labels">Влажность</span><br/>
+    <span style="font-size:3.0em" id="humidity">%HUM%</span>
+    <sup class="units">&#37;</sup>
+  </p>
+  <p></p>
+  <div id="rcorners3">
+<!--------------------------------------------------------------------------------->
+  <input type="button" id="rel1" value = "НАГРЕВ (5)" class="relayOff" /><br>
+  <input type="button" id="rel2" value = "УВЛАЖНЕНИЕ (4)" class="relayOff" /><br>
+  <input type="button" id="rel3" value = "ОХЛАЖДЕНИЕ (14)" class="relayOff" /><br>
+  <input type="button" id="rel4" value = "ВЕНТИЛЯЦИЯ (12)" class="relayOff" /><br>
+  <input type="button" id="rel5" value = "ОСВЕЩЕНИЕ (13)" class="relayOff" /><br>
+<!--------------------------------------------------------------------------------->
+  </div>
+  <p></p>
+  <p>
+    <a href="/setup"><button class="button">Установки</button></a>
+    <a href="/switch"><button class="button">Переключатели</button></a>
+  </p>
+  </div>
+</body>
+<script>
+
+function onload(){
+    var xhttp = new XMLHttpRequest();			// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         document.getElementById("temperature").innerHTML = this.responseText;
       }
     };
-    xhttp.open("POST", "color.html?temperature=1", true);	// Р°СЃРёРЅС…СЂРѕРЅРЅРёР№ СЃРїРѕСЃРѕР±
+    xhttp.open("POST", "index.html?temperature=1", true);	// асинхронний способ
+    xhttp.send();
+	
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("humidity").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("POST", "index.html?humidity=0", true);		// асинхронний способ
+    xhttp.send();
+  }
+
+// Функція для отримання стану реле
+/*	function relay_state() {
+		var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+		for(var i=1;i<6;i++){
+			request.open("GET", "/status?relay="+i,false);	//выполнение СИНХРОННО
+			// Обробка відповіді сервера
+			request.onload = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					var response = request.responseText;
+					if (response == "-ON") {
+						switch (i) {
+							case 1: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
+							case 2: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
+							case 3: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
+							case 4: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
+							case 5: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
+							default :					break;
+						} 
+					}
+					else {
+						switch (i) {
+							case 1: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
+							case 2: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
+							case 3: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
+							case 4: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
+							case 5: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
+							default :					break;
+						}						
+					}
+				}
+			}
+			request.send();
+		}
+	}*/
+	// Отримання стану реле при завантаженні сторінки
+//	document.addEventListener('DOMContentLoaded', relay_state);
+
+function rel0_update(){
+  var xhr = new(XMLHttpRequest);
+  if (rel0.value === "Start") {
+    rel0.value = "Stop";
+    xhr.open("POST", "index.html?red=0", true);
+    rel0.classList.remove('relayOn'); 
+    rel0.classList.add('relayOff');
+  } else {
+    rel0.value = "Start";
+    xhr.open("POST", "index.html?red=1", true);
+    rel0.classList.remove('relayOff'); 
+    rel0.classList.add('relayOn');
+  }
+  xhr.send(null);
+}
+  setInterval(function ( ) {
+    var xhttp = new XMLHttpRequest();			// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("temperature").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("POST", "index.html?temperature=1", true);	// асинхронний способ
     xhttp.send();
   }, 10000 ) ;
 
@@ -36,112 +228,42 @@
         document.getElementById("humidity").innerHTML = this.responseText;
       }
     };
-    xhttp.open("POST", "color.html?humidity=0", true);		// Р°СЃРёРЅС…СЂРѕРЅРЅРёР№ СЃРїРѕСЃРѕР±
+    xhttp.open("POST", "index.html?humidity=0", true);		// асинхронний способ
     xhttp.send();
   }, 10000 ) ;
-  function Timer1(){
-    xhr.open("POST", "color.html?start=0", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
-  function red_on(){
-  xhr.open("POST", "color.html?red=1", true);
-  xhr.responseType = "text";
-  xhr.onload = function (oEvent) {
-    document.getElementById('info_table').innerHTML = xhr.response;
-  }
-  xhr.send(null);
-}
-  function red_off(){
-    xhr.open("POST", "color.html?red=0", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
-  function green_on(){
-    xhr.open("POST", "color.html?green=1", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
-  function green_off(){
-    xhr.open("POST", "color.html?green=0", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
-  function blue_on(){
-    xhr.open("POST", "color.html?blue=1", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
-  function blue_off(){
-    xhr.open("POST", "color.html?blue=0", true);
-    xhr.responseType = "text";
-    xhr.onload = function (oEvent) {
-      document.getElementById('info_table').innerHTML = xhr.response;
-    }
-    xhr.send(null);
-  }
+
+/*  setInterval(function ( ) {
+	var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+		for(var i=1;i<6;i++){
+			request.open("GET", "/status?relay="+i,false);	//выполнение СИНХРОННО
+			// Обробка відповіді сервера
+			request.onload = function() {
+				if (request.readyState == 4 && request.status == 200) {
+					var response = request.responseText;
+					if (response == "-ON") {
+						switch (i) {
+							case 1: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
+							case 2: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
+							case 3: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
+							case 4: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
+							case 5: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
+							default :					break;
+						} 
+					}
+					else {
+						switch (i) {
+							case 1: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
+							case 2: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
+							case 3: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
+							case 4: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
+							case 5: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
+							default :					break;
+						}						
+					}
+				}
+			}
+			request.send();
+		}
+  }, 10000 ) ;*/
 </script>
-<style>
-  .button1 {
-    width: 150px;
-    height: 48px;
-    font-size: 17px;
-  }
-  .button1:hover { border: 1px solid rgb(198,198,198); }
-  .button1:active { background: linear-gradient(#f59500, #f5ae00) #f59500; }
-  table {
-     border: 1px solid grey;
-  }
-  th {
-     border: 1px solid grey;
-  }
-  td {
-     border: 1px solid grey;
-     text-align: center;
-  }
-</style>
-</head>
-<br/>
-<body onload="onload()">
-  <font size="5">
-    <div id="info_table"></div>
-  </font>
-  <br/>
-  <div>
-    <input class="button1" style="color: #00ffff; background-color: #800000;" type="button" onclick="red_off()" value="RED OFF" />
-    <input class="button1" style="color: #00ffff; background-color: #ff0000;" type="button" onclick="red_on()" value="RED ON"/>
-	<br/><br/>
-    <input class="button1" style="color: #ff00ff; background-color: #008000;" type="button" onclick="green_off()" value="GREEN OFF" />
-    <input class="button1" style="color: #ff00ff; background-color: #00ff00;" type="button" onclick="green_on()" value="GREEN ON" />
-	<br/><br/>
-    <input class="button1" style="color: #ffff00; background-color: #000080;" type="button" onclick="blue_off()" value="BLUE OFF" />
-    <input class="button1" style="color: #ffff00; background-color: #0000ff;" type="button" onclick="blue_on()" value="BLUE ON" />
-  </div>
-<br/><br/>
-<p id="rcorners1">
-    <span class="sensor-labels">РўРµРјРїРµСЂР°С‚СѓСЂР°</span>
-    <span style="font-size:3.0em;" id="temperature">%TMP%</span>
-    <sup class="units">&deg;C</sup>
-  </p>
- <p></p>
- <p id="rcorners2">
-    <span class="sensor-labels">Р’Р»Р°Р¶РЅРѕСЃС‚СЊ</span>
-    <span style="font-size:3.0em" id="humidity">%HUM%</span>
-    <sup class="units">&#37;</sup>
-  </p>
-</body></html>
+</html>

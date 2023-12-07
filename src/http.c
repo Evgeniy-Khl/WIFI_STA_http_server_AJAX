@@ -49,8 +49,8 @@ static esp_err_t download_get_handler(httpd_req_t *req)
 {
   char filepath[FILE_PATH_MAX];
   FILE *fd = NULL;
-  char*  buf;
-  size_t buf_len;
+   char*  buf;
+   size_t buf_len;
   struct stat file_stat;
 
   const char *filename = get_path_from_uri(filepath, ((struct file_server_data *)req->user_ctx)->base_path, req->uri, sizeof(filepath));
@@ -63,10 +63,10 @@ static esp_err_t download_get_handler(httpd_req_t *req)
     strcat(filepath, "index.html"); // добавляет strSource в strDestination и завершает результирующую строку символом NULL.(рекомендуется использовать strncat)
   }
   else if(strcmp(filename,"/setup") == 0){
-    strcat(filepath, "setup.html");
+    strcat(filepath, ".html");
   }
   else if(strcmp(filename,"/switch") == 0){
-    strcat(filepath, "switch.html");
+    strcat(filepath, ".html");
   }
   stat(filepath, &file_stat);
   fd = fopen(filepath, "r");
@@ -79,10 +79,10 @@ static esp_err_t download_get_handler(httpd_req_t *req)
   ESP_LOGI(TAG, "Sending file : %s (%ld bytes)...", filename, file_stat.st_size);
   set_content_type_from_file(req, filename);
 
-  buf_len = httpd_req_get_url_query_len(req) + 1;
-  printf("GET_handler  buf_len: %d\n", buf_len);
+  // buf_len = httpd_req_get_url_query_len(req) + 1;
+  // printf("GET_handler  buf_len: %d\n", buf_len);
 
-  if (buf_len > 1)
+  /* if (buf_len > 1)
   {
       buf = malloc(buf_len);
 
@@ -107,7 +107,7 @@ static esp_err_t download_get_handler(httpd_req_t *req)
         }
       }
       free(buf);
-  }
+  } */
 
   char *chunk = ((struct file_server_data *)req->user_ctx)->scratch;
   size_t chunksize;
@@ -125,7 +125,7 @@ static esp_err_t download_get_handler(httpd_req_t *req)
   } while (chunksize != 0);
   fclose(fd);
   ESP_LOGI(TAG, "File sending complete");
-  httpd_resp_send_chunk(req, NULL, 0);
+  httpd_resp_send_chunk(req, NULL, 0); 
   return ESP_OK;
 }
 //-------------------------------------------------------------
