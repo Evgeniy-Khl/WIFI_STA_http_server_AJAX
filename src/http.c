@@ -1,27 +1,15 @@
 #include "http.h"
+
 #define CONFIG_RED_GPIO 21
 #define CONFIG_GREEN_GPIO 22
 #define CONFIG_BLUE_GPIO 23
 #define GPIO_OUT_REG          (DR_REG_GPIO_BASE + 0x0004)
 //-------------------------------------------------------------
 static const char *TAG = "http";
-float temperature = 25.0;
-float humidity = 65.0;
 //-------------------------------------------------------------
 #define IS_FILE_EXT(filename, ext) \
     (strcasecmp(&filename[strlen(filename) - sizeof(ext) + 1], ext) == 0)
-//-------------------------------------------------------------
-float getTemperature(){
-  char resultant;
-  temperature = temperature + 0.1;
-  return temperature;
-}
-  
-float getHumidity() {
-  char resultant;
-  humidity = humidity - 0.1;
-  return humidity;
-}
+//#define void check_post_query(httpd_req_t *req, size_t buf_len)
 //-------------------------------------------------------------
 static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filename)
 {
@@ -55,30 +43,6 @@ static const char* get_path_from_uri(char *dest, const char *base_path, const ch
   strcpy(dest, base_path);// копирует строку символов из источника <base_path> в пункт назначения <dest>
   strlcpy(dest + base_pathlen, uri, pathlen + 1);// копирует из строки <uri> в буфер <dest+..> не более чем <pathlen> - 1 символов и гарантированно устанавливает в конец строки нулевой символ
   return dest + base_pathlen;
-}
-//-------------------------------------------------------------
-void send_table(httpd_req_t *req)
-{
-  char *resp_str = NULL;
-  resp_str = (char*) req->user_ctx;
-  resp_str = malloc(200);
-
-  unsigned int reg_out = *(unsigned int*) GPIO_OUT_REG;
-
-  strcpy(resp_str,"<table>\
-  <tr><th>RED</th><th>GREEN</th><th>BLUE</th></tr>\
-  <tr><td>");// копирует строку символов из источника <base_path> в пункт назначения <dest>
-  if((reg_out >> CONFIG_RED_GPIO) & 0x1) strcat(resp_str,"OFF");
-  else strcat(resp_str,"ON");// добавляет strSource в strDestination и завершает результирующую строку символом NULL.(рекомендуется использовать strncat)
-  strcat(resp_str,"</td><td>");
-  if((reg_out >> CONFIG_GREEN_GPIO) & 0x1) strcat(resp_str,"OFF");
-  else strcat(resp_str,"ON");
-  strcat(resp_str,"</td><td>");
-  if((reg_out >> CONFIG_BLUE_GPIO) & 0x1) strcat(resp_str,"OFF");
-  else strcat(resp_str,"ON");
-  strcat(resp_str,"</td></tr></table>");
-
-  httpd_resp_send(req, resp_str, strlen(resp_str));
 }
 //-------------------------------------------------------------
 static esp_err_t download_get_handler(httpd_req_t *req)
@@ -167,91 +131,13 @@ static esp_err_t download_get_handler(httpd_req_t *req)
 //-------------------------------------------------------------
 static esp_err_t download_post_handler(httpd_req_t *req)
 {
-  char *resp_str = NULL;
-  char*  buf;
   size_t buf_len;
 
+  printf("POST_handler ----------- URI: %s\n", req->uri);
   buf_len = httpd_req_get_url_query_len(req) + 1;
   printf("POST_handler  buf_len: %d\n", buf_len);
-
-  if (buf_len > 1)
-  {
-      buf = malloc(buf_len);  // динамическим распределением памяти
-
-      if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK)
-      {
-        ESP_LOGI(TAG, "Found POST_handler query => %s", buf);
-        char param[32];
-
-        if (httpd_query_key_value(buf, "red", param, sizeof(param)) == ESP_OK)
-        {
-           ESP_LOGI(TAG, "Found POST_handler query parameter => red:%s", param);
-           if(!strcmp(param,"1")) gpio_set_level(CONFIG_RED_GPIO, 0);
-           else if(!strcmp(param,"0")) gpio_set_level(CONFIG_RED_GPIO, 1);
-           send_table(req);
-        }
-
-        else if (httpd_query_key_value(buf, "green", param, sizeof(param)) == ESP_OK)
-        {
-           ESP_LOGI(TAG, "Found POST_handler query parameter => green:%s", param);
-           if(!strcmp(param,"1")) gpio_set_level(CONFIG_GREEN_GPIO, 0);
-           else if(!strcmp(param,"0")) gpio_set_level(CONFIG_GREEN_GPIO, 1);
-           send_table(req);
-        }
-
-        else if (httpd_query_key_value(buf, "blue", param, sizeof(param)) == ESP_OK)
-        {
-           ESP_LOGI(TAG, "Found POST_handler query parameter => blue:%s", param);
-           if(!strcmp(param,"1")) gpio_set_level(CONFIG_BLUE_GPIO, 0);
-           else if(!strcmp(param,"0")) gpio_set_level(CONFIG_BLUE_GPIO, 1);
-           send_table(req);
-        }
-        else if (httpd_query_key_value(buf, "temperature", param, sizeof(param)) == ESP_OK)
-        {
-           ESP_LOGI(TAG, "Found POST_handler query parameter => temperature:%s", param);
-           sprintf(buf, "%.1f", getTemperature());
-           printf("resp: %s\n", buf);
-           httpd_resp_send(req, buf, strlen(buf));
-        }
-        else if (httpd_query_key_value(buf, "humidity", param, sizeof(param)) == ESP_OK)
-        {
-           ESP_LOGI(TAG, "Found POST_handler query parameter => humidity:%s", param);
-           sprintf(buf, "%.1f", getHumidity());
-           printf("resp: %s\n", buf);
-           httpd_resp_send(req, buf, strlen(buf));
-        }
-        else send_table(req);
-
-        //---***--
-        //httpd_resp_send_chunk(req, resp_str, strlen(resp_str));
-        //---***--
-        
-        //resp_str = (char*) req->user_ctx;
-        //resp_str = malloc(200);
-
-        //unsigned int reg_out = *(unsigned int*) GPIO_OUT_REG;
-
-        //strcpy(resp_str,"<table>
-        //<tr><th>RED</th><th>GREEN</th><th>BLUE</th></tr>
-        //<tr><td>");// копирует строку символов из источника <base_path> в пункт назначения <dest>
-        //if((reg_out >> CONFIG_RED_GPIO) & 0x1) strcat(resp_str,"OFF");
-        //else strcat(resp_str,"ON");// добавляет strSource в strDestination и завершает результирующую строку символом NULL.(рекомендуется использовать strncat)
-        //strcat(resp_str,"</td><td>");
-        //if((reg_out >> CONFIG_GREEN_GPIO) & 0x1) strcat(resp_str,"OFF");
-        //else strcat(resp_str,"ON");
-        //strcat(resp_str,"</td><td>");
-        //if((reg_out >> CONFIG_BLUE_GPIO) & 0x1) strcat(resp_str,"OFF");
-        //else strcat(resp_str,"ON");
-        //strcat(resp_str,"</td></tr></table>");
-
-        //httpd_resp_send(req, resp_str, strlen(resp_str));
-       
-        free(resp_str);
-      }
-      free(buf);
-  }
-
-
+  if (buf_len > 1) check_post_query(req, buf_len);
+ 
   return ESP_OK;
 }
 //-------------------------------------------------------------
@@ -263,12 +149,12 @@ httpd_handle_t start_webserver(void)
   static struct file_server_data *server_data = NULL;
   if (server_data) {
       ESP_LOGE(TAG, "File server already started");
-      return ESP_ERR_INVALID_STATE;
+      return NULL; //ESP_ERR_INVALID_STATE;
   }
   server_data = calloc(1, sizeof(struct file_server_data));
   if (!server_data) {
       ESP_LOGE(TAG, "Failed to allocate memory for server data");
-      return ESP_ERR_NO_MEM;
+      return NULL; //ESP_ERR_NO_MEM;
   }
   strlcpy(server_data->base_path, "/spiffs",
            sizeof(server_data->base_path));
