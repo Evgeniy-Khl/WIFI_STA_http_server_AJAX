@@ -49,8 +49,8 @@ static esp_err_t download_get_handler(httpd_req_t *req)
 {
   char filepath[FILE_PATH_MAX];
   FILE *fd = NULL;
-   char*  buf;
-   size_t buf_len;
+  //  char*  buf;
+  //  size_t buf_len;
   struct stat file_stat;
 
   const char *filename = get_path_from_uri(filepath, ((struct file_server_data *)req->user_ctx)->base_path, req->uri, sizeof(filepath));
