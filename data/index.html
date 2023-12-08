@@ -122,11 +122,11 @@
   <p></p>
   <div id="rcorners3">
 <!--------------------------------------------------------------------------------->
-  <input type="button" id="rel1" value = "НАГРЕВ (5)" class="relayOff" /><br>
-  <input type="button" id="rel2" value = "УВЛАЖНЕНИЕ (4)" class="relayOff" /><br>
-  <input type="button" id="rel3" value = "ОХЛАЖДЕНИЕ (14)" class="relayOff" /><br>
-  <input type="button" id="rel4" value = "ВЕНТИЛЯЦИЯ (12)" class="relayOff" /><br>
-  <input type="button" id="rel5" value = "ОСВЕЩЕНИЕ (13)" class="relayOff" /><br>
+  <input type="button" id="rel1" value = "НАГРЕВ (20)" class="relayOff" /><br>
+  <input type="button" id="rel2" value = "УВЛАЖНЕНИЕ (21)" class="relayOff" /><br>
+  <input type="button" id="rel3" value = "ОХЛАЖДЕНИЕ (22)" class="relayOff" /><br>
+  <input type="button" id="rel4" value = "ВЕНТИЛЯЦИЯ (23)" class="relayOff" /><br>
+  <input type="button" id="rel5" value = "ОСВЕЩЕНИЕ (24)" class="relayOff" /><br>
 <!--------------------------------------------------------------------------------->
   </div>
   <p></p>
@@ -161,7 +161,7 @@ function onload(){
 // Функція для отримання стану реле
 	function relay_state() {
 		var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
-		for(var i=21;i<24;i++){
+		for(var i=0;i<5;i++){
 			request.open("POST", "index.html?status="+i,false);	//выполнение СИНХРОННО
 			// Обробка відповіді сервера
 			request.onload = function() {
@@ -169,21 +169,21 @@ function onload(){
 					var response = request.responseText;
 					if (response == "ON") {
 						switch (i) {
-							case 1: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
-							case 2: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
-							case 3: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
-							case 4: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
-							case 5: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
+							case 0: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
+							case 1: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
+							case 2: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
+							case 3: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
+							case 4: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
 							default :					break;
 						} 
 					}
 					else {
 						switch (i) {
-							case 1: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
-							case 2: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
-							case 3: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
-							case 4: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
-							case 5: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
+							case 0: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
+							case 1: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
+							case 2: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
+							case 3: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
+							case 4: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
 							default :					break;
 						}						
 					}
@@ -234,7 +234,7 @@ function rel0_update(){
 
   setInterval(function ( ) {
 	var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
-		for(var i=21;i<24;i++){
+		for(var i=0;i<5;i++){
 			request.open("POST", "index.html?status="+i,false);	//выполнение СИНХРОННО
 			// Обробка відповіді сервера
 			request.onload = function() {
@@ -242,21 +242,21 @@ function rel0_update(){
 					var response = request.responseText;
 					if (response == "ON") {
 						switch (i) {
-							case 1: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
-							case 2: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
-							case 3: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
-							case 4: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
-							case 5: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
+							case 0: rel1.classList.remove('relayOff'); rel1.classList.add('relayOn'); break;
+							case 1: rel2.classList.remove('relayOff'); rel2.classList.add('relayOn'); break;
+							case 2: rel3.classList.remove('relayOff'); rel3.classList.add('relayOn'); break;
+							case 3: rel4.classList.remove('relayOff'); rel4.classList.add('relayOn');; break;
+							case 4: rel5.classList.remove('relayOff'); rel5.classList.add('relayOn'); break;
 							default :					break;
 						} 
 					}
 					else {
 						switch (i) {
-							case 1: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
-							case 2: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
-							case 3: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
-							case 4: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
-							case 5: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
+							case 0: rel1.classList.remove('relayOn'); rel1.classList.add('relayOff'); break;
+							case 1: rel2.classList.remove('relayOn'); rel2.classList.add('relayOff'); break;
+							case 2: rel3.classList.remove('relayOn'); rel3.classList.add('relayOff'); break;
+							case 3: rel4.classList.remove('relayOn'); rel4.classList.add('relayOff');; break;
+							case 4: rel5.classList.remove('relayOn'); rel5.classList.add('relayOff'); break;
 							default :					break;
 						}						
 					}

@@ -1,8 +1,5 @@
 #include "http.h"
 
-#define CONFIG_RED_GPIO 21
-#define CONFIG_GREEN_GPIO 22
-#define CONFIG_BLUE_GPIO 23
 #define GPIO_OUT_REG          (DR_REG_GPIO_BASE + 0x0004)
 //-------------------------------------------------------------
 static const char *TAG = "http";

@@ -1,12 +1,5 @@
 #include "wifi.h"
 //-------------------------------------------------------------
-#define CONFIG_LED_GPIO 2
-#define CONFIG_RED_GPIO 21
-#define CONFIG_GREEN_GPIO 22
-#define CONFIG_BLUE_GPIO 23
-
-#define CONFIG_ESP_WIFI_SSID "Andrew_2023"
-#define CONFIG_ESP_WIFI_PASSWORD "graviton19630301"
 #define WIFI_SCAN_METHOD 	WIFI_ALL_CHANNEL_SCAN
 
 #define WIFI_CONNECT_AP_SORT_METHOD		WIFI_CONNECT_AP_BY_SIGNAL

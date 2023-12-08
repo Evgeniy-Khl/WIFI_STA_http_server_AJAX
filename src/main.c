@@ -1,10 +1,5 @@
 #include "main.h"
 
-#define CONFIG_LED_GPIO 2
-#define CONFIG_RED_GPIO 21
-#define CONFIG_GREEN_GPIO 22
-#define CONFIG_BLUE_GPIO 23
-
 //-------------------------------------------------------------
 static const char *TAG = "main";
 //-------------------------------------------------------------
