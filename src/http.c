@@ -131,6 +131,9 @@ static esp_err_t download_post_handler(httpd_req_t *req)
   size_t buf_len;
 
   printf("POST_handler ----------- URI: %s\n", req->uri);
+
+  if(!strncmp(req->uri,"/index.html",5)) printf("POST_handler ----------- YES URI=/index.html -> %s\n", req->uri);
+  if(!strncmp(req->uri,"/swich.html",5)) printf("POST_handler ----------- YES URI=/swich.html -> %s\n", req->uri);
   buf_len = httpd_req_get_url_query_len(req) + 1;
   printf("POST_handler  buf_len: %d\n", buf_len);
   if (buf_len > 1) check_post_query(req, buf_len);

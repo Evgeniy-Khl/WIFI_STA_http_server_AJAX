@@ -72,6 +72,34 @@ void check_post_query(httpd_req_t *req, size_t buf_len)
            httpd_resp_send(req, resp_str, strlen(resp_str));
            free(resp_str);
         }
+        else if (httpd_query_key_value(buf, "update", param, sizeof(param)) == ESP_OK)
+        {
+            char state[4];
+            char *resp_str = NULL;
+            resp_str = (char*) req->user_ctx;
+            resp_str = malloc(4);
+            httpd_query_key_value(buf, "state", state, sizeof(param));
+           // param = "rel1"; state = "1";
+            ESP_LOGI(TAG, "Found POST_handler query parameter => update:%s  state:%s", param, state);
+            if(!strncmp(param,"rel1",4)){
+               if (!strcmp(state,"1")) {gpio_set_level(CONFIG_WHITE_GPIO, 0); strcpy(resp_str,"ON");}
+               else if(!strcmp(state,"0")) {gpio_set_level(CONFIG_WHITE_GPIO, 1); strcpy(resp_str,"OFF");}
+            }
+            else if(!strncmp(param,"rel2",4)){
+               if (!strcmp(state,"1")) {gpio_set_level(CONFIG_RED_GPIO, 0); strcpy(resp_str,"ON");}
+               else if(!strcmp(state,"0")) {gpio_set_level(CONFIG_RED_GPIO, 1); strcpy(resp_str,"OFF");}
+            }
+            else if(!strncmp(param,"rel3",4)){
+               if (!strcmp(state,"1")) {gpio_set_level(CONFIG_GREEN_GPIO, 0); strcpy(resp_str,"ON");}
+               else if(!strcmp(state,"0")) {gpio_set_level(CONFIG_GREEN_GPIO, 1); strcpy(resp_str,"OFF");}
+            }
+            else if(!strncmp(param,"rel4",4)){
+               if (!strcmp(state,"1")) {gpio_set_level(CONFIG_BLUE_GPIO, 0); strcpy(resp_str,"ON");}
+               else if(!strcmp(state,"0")) {gpio_set_level(CONFIG_BLUE_GPIO, 1); strcpy(resp_str,"OFF");}
+            } 
+            httpd_resp_send(req, resp_str, strlen(resp_str));
+            free(resp_str);  
+        }
         else if (httpd_query_key_value(buf, "temperature", param, sizeof(param)) == ESP_OK)
         {
            ESP_LOGI(TAG, "Found POST_handler query parameter => temperature:%s", param);
