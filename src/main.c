@@ -30,12 +30,12 @@ void app_main(void)
 
   //listing all the key-value pairs of any type under specified partition and namespace
   nvs_iterator_t it = NULL;
-  ret = nvs_entry_find("nvs", NULL, NVS_TYPE_ANY, it);
+  ret = nvs_entry_find("nvs", NULL, NVS_TYPE_ANY, &it);
   while (it != NULL) 
   {
           nvs_entry_info_t info;
           nvs_entry_info(it, &info);
-          it = nvs_entry_next(it);
+          ret = nvs_entry_next(&it);
           printf("NVS -> key '%s', type '%02x' \n", info.key, info.type);
   };
   nvs_release_iterator(it);
@@ -103,9 +103,9 @@ nvs_handle_t my_handle;
     nvs_get_u16(my_handle, "dt04", &res04);
     printf("dt04: %d\n", res04);
     nvs_get_i32(my_handle, "dt05", &res05);
-    printf("dt05: %d\n", res05);
+    printf("dt05: %li\n", res05);
     nvs_get_u32(my_handle, "dt06", &res06);
-    printf("dt06: %u\n", res06);
+    printf("dt06: %lu\n", res06);
     nvs_get_i64(my_handle, "dt07", &res07);
     printf("dt07: %lld\n", res07);
     nvs_get_u64(my_handle, "dt08", &res08);
