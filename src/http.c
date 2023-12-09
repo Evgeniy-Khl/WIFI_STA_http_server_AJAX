@@ -76,36 +76,6 @@ static esp_err_t download_get_handler(httpd_req_t *req)
   ESP_LOGI(TAG, "Sending file : %s (%ld bytes)...", filename, file_stat.st_size);
   set_content_type_from_file(req, filename);
 
-  // buf_len = httpd_req_get_url_query_len(req) + 1;
-  // printf("GET_handler  buf_len: %d\n", buf_len);
-
-  /* if (buf_len > 1)
-  {
-      buf = malloc(buf_len);
-
-      if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK)
-      {
-        ESP_LOGI(TAG, "Found URL query => %s", buf);
-        char param[32];
-        if (httpd_query_key_value(buf, "red", param, sizeof(param)) == ESP_OK) {
-            ESP_LOGI(TAG, "Found URL query parameter => red:%s", param);
-            if(!strcmp(param,"RED+ON"))  gpio_set_level(CONFIG_RED_GPIO, 0);
-            else if(!strcmp(param,"RED+OFF"))  gpio_set_level(CONFIG_RED_GPIO, 1);
-        }
-        if (httpd_query_key_value(buf, "green", param, sizeof(param)) == ESP_OK) {
-            ESP_LOGI(TAG, "Found URL query parameter => green:%s", param);
-            if(!strcmp(param,"GREEN+ON"))  gpio_set_level(CONFIG_GREEN_GPIO, 0);
-            else if(!strcmp(param,"GREEN+OFF"))  gpio_set_level(CONFIG_GREEN_GPIO, 1);
-        }
-        if (httpd_query_key_value(buf, "blue", param, sizeof(param)) == ESP_OK) {
-            ESP_LOGI(TAG, "Found URL query parameter => blue:%s", param);
-            if(!strcmp(param,"BLUE+ON"))  gpio_set_level(CONFIG_BLUE_GPIO, 0);
-            else if(!strcmp(param,"BLUE+OFF"))  gpio_set_level(CONFIG_BLUE_GPIO, 1);
-        }
-      }
-      free(buf);
-  } */
-
   char *chunk = ((struct file_server_data *)req->user_ctx)->scratch;
   size_t chunksize;
   do {
