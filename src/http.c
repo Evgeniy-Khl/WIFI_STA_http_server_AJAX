@@ -22,49 +22,10 @@ static esp_err_t set_content_type_from_file(httpd_req_t *req, const char *filena
     return httpd_resp_set_type(req, "text/plain");
 }
 //-------------------------------------------------------------
-static const char* get_path_from_uri(char *dest, const char *base_path, const char *uri, size_t destsize)
+static esp_err_t send_content_from_file(httpd_req_t *req, char *filepath, const char *filename)
 {
-  const size_t base_pathlen = strlen(base_path);
-  size_t pathlen = strlen(uri);
-  const char *quest = strchr(uri, '?');// выполняет поиск первого вхождения символа <symbol> в строку uri
-  if (quest) {
-      pathlen = MIN(pathlen, quest - uri);
-  }
-  const char *hash = strchr(uri, '#');// выполняет поиск первого вхождения символа <symbol> в строку uri
-  if (hash) {
-      pathlen = MIN(pathlen, hash - uri);
-  }
-  if (base_pathlen + pathlen + 1 > destsize) {
-    return NULL;
-  }
-  strcpy(dest, base_path);// копирует строку символов из источника <base_path> в пункт назначения <dest>
-  strlcpy(dest + base_pathlen, uri, pathlen + 1);// копирует из строки <uri> в буфер <dest+..> не более чем <pathlen> - 1 символов и гарантированно устанавливает в конец строки нулевой символ
-  return dest + base_pathlen;
-}
-//-------------------------------------------------------------
-static esp_err_t download_get_handler(httpd_req_t *req)
-{
-  char filepath[FILE_PATH_MAX];
   FILE *fd = NULL;
-  //  char*  buf;
-  //  size_t buf_len;
   struct stat file_stat;
-
-  const char *filename = get_path_from_uri(filepath, ((struct file_server_data *)req->user_ctx)->base_path, req->uri, sizeof(filepath));
-  if (!filename) {
-      ESP_LOGE(TAG, "Filename is too long");
-      httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
-      return ESP_FAIL;
-  }
-  if (strcmp(filename,"/") == 0) {  // string1 идентична string2
-    strcat(filepath, "index.html"); // добавляет strSource в strDestination и завершает результирующую строку символом NULL.(рекомендуется использовать strncat)
-  }
-  else if(strcmp(filename,"/setup") == 0){
-    strcat(filepath, ".html");
-  }
-  else if(strcmp(filename,"/switch") == 0){
-    strcat(filepath, ".html");
-  }
   stat(filepath, &file_stat);
   fd = fopen(filepath, "r");
   if (!fd) {
@@ -95,6 +56,57 @@ static esp_err_t download_get_handler(httpd_req_t *req)
   httpd_resp_send_chunk(req, NULL, 0); 
   return ESP_OK;
 }
+static const char* get_path_from_uri(char *dest, const char *base_path, const char *uri, size_t destsize)
+{
+  const size_t base_pathlen = strlen(base_path);
+  size_t pathlen = strlen(uri);
+  const char *quest = strchr(uri, '?');// выполняет поиск первого вхождения символа <symbol> в строку uri
+  if (quest) {
+      pathlen = MIN(pathlen, quest - uri);
+  }
+  const char *hash = strchr(uri, '#');// выполняет поиск первого вхождения символа <symbol> в строку uri
+  if (hash) {
+      pathlen = MIN(pathlen, hash - uri);
+  }
+  if (base_pathlen + pathlen + 1 > destsize) {
+    return NULL;
+  }
+  strcpy(dest, base_path);// копирует строку символов из источника <base_path> в пункт назначения <dest>
+  strlcpy(dest + base_pathlen, uri, pathlen + 1);// копирует из строки <uri> в буфер <dest+..> не более чем <pathlen> - 1 символов и гарантированно устанавливает в конец строки нулевой символ
+  return dest + base_pathlen;
+}
+//-------------------------------------------------------------
+static esp_err_t download_get_handler(httpd_req_t *req)
+{
+  esp_err_t ret = ESP_OK;
+  char filepath[FILE_PATH_MAX];
+    
+  const char *filename = get_path_from_uri(filepath, ((struct file_server_data *)req->user_ctx)->base_path, req->uri, sizeof(filepath));
+  if (!filename) {
+      ESP_LOGE(TAG, "Filename is too long");
+      httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Filename too long");
+      return ESP_FAIL;
+  }
+  if (strcmp(filename,"/") == 0) {  // string1 идентична string2
+    strcat(filepath, "index.html"); // добавляет strSource в strDestination и завершает результирующую строку символом NULL.(рекомендуется использовать strncat)
+    ret = send_content_from_file(req, filepath, filename);
+  }
+  else if(strcmp(filename,"/switch") == 0){
+    strcat(filepath, ".html");
+    ret = send_content_from_file(req, filepath, filename);
+  }
+  else if(strcmp(filename,"/setup") == 0){
+    size_t buf_len = httpd_req_get_url_query_len(req) + 1;
+    printf("GET_handler  buf_len: %d\n", buf_len);
+    if (buf_len > 1) check_post_query(req, buf_len);
+    else 
+    {
+      strcat(filepath, ".html");
+      ret = send_content_from_file(req, filepath, filename);
+    }
+  }
+  return ret;
+}
 //-------------------------------------------------------------
 static esp_err_t download_post_handler(httpd_req_t *req)
 {
@@ -102,8 +114,8 @@ static esp_err_t download_post_handler(httpd_req_t *req)
 
   printf("POST_handler ----------- URI: %s\n", req->uri);
 
-  if(!strncmp(req->uri,"/index.html",5)) printf("POST_handler ----------- YES URI=/index.html -> %s\n", req->uri);
-  if(!strncmp(req->uri,"/swich.html",5)) printf("POST_handler ----------- YES URI=/swich.html -> %s\n", req->uri);
+  // if(!strncmp(req->uri,"/index.html",5)) printf("POST_handler ----------- YES URI=/index.html -> %s\n", req->uri);
+  // if(!strncmp(req->uri,"/swich.html",5)) printf("POST_handler ----------- YES URI=/swich.html -> %s\n", req->uri);
   buf_len = httpd_req_get_url_query_len(req) + 1;
   printf("POST_handler  buf_len: %d\n", buf_len);
   if (buf_len > 1) check_post_query(req, buf_len);

@@ -5,7 +5,7 @@
 -->
 <html>
 <head>
-  <title>ESP8266 Web Server</title>
+  <title>My Web Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <!--link rel="stylesheet" type="text/css" href="style.css">
@@ -103,9 +103,9 @@
 	}
   </style>
 </head>
-<body onload="onload()">
+<body>
   <div id="grad1">
-  <h1>ESP8266 Web Server</h1> 
+  <h1>Web Server</h1> 
     <input type="button" id="rel0" value = "Stop" onclick="rel0_update()" class="relayOff" />
   <p></p>
   <p id="rcorners1">
@@ -138,7 +138,7 @@
 </body>
 <script>
 
-function onload(){
+function firsload(){
     var xhttp = new XMLHttpRequest();			// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -156,10 +156,10 @@ function onload(){
     };
     xhttp.open("POST", "index.html?humidity=0", true);		// асинхронний способ
     xhttp.send();
-  }
+
 
 // Функція для отримання стану реле
-	function relay_state() {
+
 		var request = new XMLHttpRequest();		// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
 		for(var i=0;i<5;i++){
 			request.open("POST", "index.html?status="+i,false);	//выполнение СИНХРОННО
@@ -191,9 +191,9 @@ function onload(){
 			}
 			request.send();
 		}
-	}
+}
 	// Отримання стану реле при завантаженні сторінки
-	document.addEventListener('DOMContentLoaded', relay_state);
+	document.addEventListener('DOMContentLoaded', firsload);
 
 function rel0_update(){
   var xhr = new(XMLHttpRequest);

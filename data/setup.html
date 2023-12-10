@@ -11,7 +11,7 @@
   	  text-align: center;
 	}
 	#grad1 {
-      height: 250px;
+      height: 0px auto;
       background-color: #9d9e9b; /* For browsers that do not support gradients */
       background-image: linear-gradient(to bottom right, #585957, #db9951);
     }
@@ -36,83 +36,98 @@
  </head>
  <body>
   <div id="grad1">
-  <h1>ESP8266 Установки</h1>
+  <h1>Установки</h1>
 <!------------------------------------------------------------->
-  <form action="/get" target="hidden-form">
-    SetUp1 (значение %inputString%): <input type="text" name="SetUp1">
-    <input type="submit" value="Записать" onclick="submitMessage()">
-  </form><br>
-  <form action="/get" target="hidden-form">
-    SetUp2 (значение %inputInt%): <input type="number " name="SetUp2">
-    <input type="submit" value="Записать" onclick="submitMessage()">
-  </form><br>
-  <form action="/get" target="hidden-form">
-    SetUp3 (значение %inputFloat%): <input type="number " name="SetUp3">
-    <input type="submit" value="Записать" onclick="submitMessage()">
-  </form>
-  <iframe style="display:none" name="hidden-form"></iframe>
-<!--
   <p></p>
-  <form action="/get" target="hidden-form">
+  <form action="/setup" target="hidden-form">
   <table>
+  <tr><h2>Наименование SSID</h2></tr>
   <tr>
-    <th style="width:40%"></th>
     <th>Текущее</th>
     <th>Новое</th>
   </tr>
   <tr>
-    <td style="font-size:25px">Наименование1</td>
-    <td>%inputString%</td>
-    <td><input type="text" name="SetUp1"></td>
+    
+    <td style="background-color: #D6EEEE" id="inputSSID">%SSID%</td>
+    <td><input type="text" name="setSSID"></td>
     <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
   </tr>
   </table>
   </form>
   <iframe style="display:none" name="hidden-form"></iframe>
 
-  <form action="/get" target="hidden-form">
+  <form action="/setup" target="hidden-form">
   <table>
+  <tr><h2>Пароль сети.</h2></tr>
   <tr>
-    <th style="width:40%"></th>
     <th>Текущее</th>
     <th>Новое</th>
   </tr>
   <tr>
-    <td style="font-size:25px">Наименование2</td>
-    <td>%inputString%</td>
-    <td><input type="number" name="SetUp2"></td>
+    <td style="background-color: #D6EEEE" id="inputPSW">%PSW%</td>
+    <td><input type="text" name="setPSW"></td>
     <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
   </tr>
   </table>
   </form>
   <iframe style="display:none" name="hidden-form"></iframe>
 
-  <form action="/get" target="hidden-form">
+  <form action="/setup" target="hidden-form">
   <table>
+  <tr><h2>Наименование2</h2></tr>
   <tr>
-    <th style="width:40%"></th>
     <th>Текущее</th>
     <th>Новое</th>
   </tr>
   <tr>
-    <td style="font-size:25px">Наименование3</td>
-    <td>%inputString%</td>
-    <td><input type="number" name="SetUp3"></td>
+    <td style="background-color: #D6EEEE" id="inputID">%netID%</td>
+    <td><input type="number" name="setID"></td>
     <td><input type="submit" value="Записать" onclick="submitMessage()"></td>
   </tr>
   </table>
   </form><br><br>
   <iframe style="display:none" name="hidden-form"></iframe>
-<!------------------------------------------------------------->  
+<!-------------------------------------------------------------> 
   <p>
     <a href="/"><button class="button">ВЫХОД</button></a>
   </p>
   </div>
 <script>
-	function submitMessage() {
-		alert("Saved value to ESP SPIFFS");
-		setTimeout(function(){ document.location.reload(false); }, 500);
-	}
+function firsload(){
+    var xhttp = new XMLHttpRequest();			// XMLHttpRequest (XHR)- об'єкт для відправки і отримання даних з сервера без перезавантаження веб-сторінки.
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("inputSSID").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("POST", "setup.html?mySSID=0", true);	// асинхронний способ
+    xhttp.send();
+	
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("inputPSW").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("POST", "setup.html?myPSW=0", true);		// асинхронний способ
+    xhttp.send();
+	
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("inputID").innerHTML = this.responseText;
+      }
+    };
+    xhttp.open("POST", "setup.html?myID=0", true);		// асинхронний способ
+    xhttp.send();
+}
+	// Отримання стану реле при завантаженні сторінки
+	document.addEventListener('DOMContentLoaded', firsload);
+
+function submitMessage() {
+	alert("Saved value to ESP SPIFFS");
+	setTimeout(function(){ document.location.reload(false); }, 500);
+}
 </script>
 </body>
 </html>

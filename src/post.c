@@ -5,6 +5,9 @@
 static const char *TAG = "post";
 float temperature = 25.0;
 float humidity = 65.0;
+extern char *nvs_mySSID;
+extern char *nvs_myPSW;
+extern uint8_t nvs_myID;
 //-------------------------------------------------------------
 #define NUM_RELAYS  5   // Set number of relays
 int relayGPIOs[NUM_RELAYS] = {4, 5, 18, 19, 13};  // Assign each GPIO to a relay
@@ -114,6 +117,51 @@ void check_post_query(httpd_req_t *req, size_t buf_len)
            printf("resp: %s\n", buf);
            httpd_resp_send(req, buf, strlen(buf));
         }
+        else if (httpd_query_key_value(buf, "setSSID", param, sizeof(param)) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found POST_handler query parameter => setSSID:%s", param);
+            strcpy(nvs_mySSID, param);
+            // esp_err_t ret = nvs_set_str(my_handle, "grvSSID", "grvLogin");
+            // printf((ret != ESP_OK) ? "Failed!\n" : "Done\n");
+            ESP_LOGI(TAG, "NEW parameter => setSSID:%s", nvs_mySSID);
+            httpd_resp_send(req, param, strlen(param));
+        }
+        else if (httpd_query_key_value(buf, "setPSW", param, sizeof(param)) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found POST_handler query parameter => setPSW:%s", param);
+            strcpy(nvs_myPSW, param);
+            // esp_err_t ret = nvs_set_str(my_handle, "grvSSID", "grvLogin");
+            // printf((ret != ESP_OK) ? "Failed!\n" : "Done\n");
+            ESP_LOGI(TAG, "NEW parameter => setPSW:%s", nvs_myPSW);
+            httpd_resp_send(req, param, strlen(param));
+        }
+        else if (httpd_query_key_value(buf, "setID", param, sizeof(param)) == ESP_OK)
+        {
+            char *end;
+            ESP_LOGI(TAG, "Found POST_handler query parameter => setID:%s", param);
+            nvs_myID = strtod(param, &end);
+            // esp_err_t ret = nvs_set_str(my_handle, "grvSSID", "grvLogin");
+            // printf((ret != ESP_OK) ? "Failed!\n" : "Done\n");
+            ESP_LOGI(TAG, "NEW parameter => setID:%u", nvs_myID);
+            httpd_resp_send(req, param, strlen(param));
+        }
+        else if (httpd_query_key_value(buf, "mySSID", param, sizeof(param)) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found POST_handler query parameter => mySSID:%s", nvs_mySSID);
+            httpd_resp_send(req, nvs_mySSID, strlen(nvs_mySSID));
+        }
+        else if (httpd_query_key_value(buf, "myPSW", param, sizeof(param)) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found POST_handler query parameter => myPSW:%s", nvs_myPSW);
+            httpd_resp_send(req, nvs_myPSW, strlen(nvs_myPSW));
+        }
+        else if (httpd_query_key_value(buf, "myID", param, sizeof(param)) == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Found POST_handler query parameter => myID:%u", nvs_myID);
+            sprintf(buf, "%u", nvs_myID);
+            httpd_resp_send(req, buf, strlen(buf));
+        }
+        else ESP_LOGI(TAG, "NO found POST_handler query parameter => %s", param);
       //   free(resp_str);
       }
       free(buf);

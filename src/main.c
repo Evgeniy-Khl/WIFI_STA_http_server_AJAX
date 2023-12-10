@@ -2,6 +2,9 @@
 
 //-------------------------------------------------------------
 static const char *TAG = "main";
+char *nvs_mySSID;
+char *nvs_myPSW;
+uint8_t nvs_myID = 0;
 //-------------------------------------------------------------
 void app_main(void)
 {
@@ -48,7 +51,7 @@ nvs_handle_t my_handle;
   if (ret != ESP_OK) printf("Error (%s) opening NVS handle!\n", esp_err_to_name(ret));
   else
   {
-    printf("Done\n");
+    /* printf("Done\n");
     // Write
     int8_t val01 = -108;
     uint8_t val02 = 198;
@@ -57,17 +60,18 @@ nvs_handle_t my_handle;
     int32_t val05 = -101459;
     uint32_t val06 = 3352582294;
     int64_t val07 = -4047512760478312334;
-    uint64_t val08 = 7214561357951254753;
+    uint64_t val08 = 7214561357951254753; */
     // Read
     int8_t res01 = 0;
-    uint8_t res02 = 0;
+    extern uint8_t nvs_myID;
+    // uint8_t res02 = 0;
     int16_t res03 = 0;
     uint16_t res04 = 0;
     int32_t res05 = 0;
     uint32_t res06 = 0;
     int64_t res07 = 0;
     uint64_t res08 = 0;
-    printf("Updating data in NVS ... ");
+    /* printf("Updating data in NVS ... ");
     ret = nvs_set_i8(my_handle, "dt01", val01);
     printf((ret != ESP_OK) ? "Failed!\n" : "Done\n");
     ret = nvs_set_u8(my_handle, "dt02", val02);
@@ -92,12 +96,12 @@ nvs_handle_t my_handle;
 
     printf("Committing updates in NVS ... ");
     ret = nvs_commit(my_handle);
-    printf((ret != ESP_OK) ? "Failed!\n" : "Done\n");
+    printf((ret != ESP_OK) ? "Failed!\n" : "Done\n"); */
 
     nvs_get_i8(my_handle, "dt01", &res01);
     printf("dt01: %d\n", res01);
-    nvs_get_u8(my_handle, "dt02", &res02);
-    printf("dt02: %d\n", res02);
+    nvs_get_u8(my_handle, "dt02", &nvs_myID);
+    printf("dt02: %d\n", nvs_myID);
     nvs_get_i16(my_handle, "dt03", &res03);
     printf("dt03: %d\n", res03);
     nvs_get_u16(my_handle, "dt04", &res04);
@@ -118,11 +122,11 @@ nvs_handle_t my_handle;
     {
         case ESP_OK:
             printf("Done\n");
-            char *nvs_ret_data;
-            nvs_ret_data = malloc(nvs_required_size);
-            ret = nvs_get_str(my_handle, "grvSSID", nvs_ret_data, &nvs_required_size );
-            printf("grvSSID: %s\n", nvs_ret_data);
-            free(nvs_ret_data);
+            
+            nvs_mySSID = malloc(nvs_required_size);
+            ret = nvs_get_str(my_handle, "grvSSID", nvs_mySSID, &nvs_required_size );
+            printf("grvSSID: %s\n", nvs_mySSID);
+            // free(nvs_ret_data);
             break;
         case ESP_ERR_NVS_NOT_FOUND:
             printf("The value is not initialized yet!\n");
@@ -137,11 +141,11 @@ nvs_handle_t my_handle;
     {
         case ESP_OK:
             printf("Done\n");
-            char *nvs_ret_data;
-            nvs_ret_data = malloc(nvs_required_size);
-            ret = nvs_get_str(my_handle, "grvPASS", nvs_ret_data, &nvs_required_size );
-            printf("grvPASS: %s\n", nvs_ret_data);
-            free(nvs_ret_data);
+
+            nvs_myPSW = malloc(nvs_required_size);
+            ret = nvs_get_str(my_handle, "grvPASS", nvs_myPSW, &nvs_required_size );
+            printf("grvPASS: %s\n", nvs_myPSW);
+            // free(nvs_ret_data);
             break;
         case ESP_ERR_NVS_NOT_FOUND:
             printf("The value is not initialized yet!\n");
