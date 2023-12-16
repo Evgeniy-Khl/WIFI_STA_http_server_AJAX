@@ -12,5 +12,7 @@
 #include "spiffs_config.h"
 #include "wifi.h"
 #include "http.h"
+#include "owb.h"
+#include "ds18b20.h"
 //-------------------------------------------------------------
 #endif /* MAIN_MAIN_H_ */
