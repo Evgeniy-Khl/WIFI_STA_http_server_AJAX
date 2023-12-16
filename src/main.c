@@ -7,6 +7,7 @@ uint8_t nvs_myID = 0;
 //-------------------------------------------------------------
 #define DS18B20_RESOLUTION   (DS18B20_RESOLUTION_12_BIT)
 #define MAX_DEVICES  (3)
+float readings[MAX_DEVICES] = { 199 };
 //-------------------------------------------------------------
 void app_main(void)
 {
@@ -259,7 +260,30 @@ void app_main(void)
 
   if (num_devices > 0)
   {
-    // mqtt_start(owb, devices, num_devices);
+    int errors_count[MAX_DEVICES] = {0};
+    while (1)
+    {   
+        TickType_t last_wake_time = xTaskGetTickCount();    
+        
+        // In this application all devices use the same resolution,
+        // so use the first device to determine the delay
+        // ds18b20_wait_for_conversion(devices[0]);
+        // Read the results immediately after conversion otherwise it may fail
+        // (using printf before reading may take too long)
+        
+        DS18B20_ERROR errors[MAX_DEVICES] = { 0 };
+        for (int i = 0; i < num_devices; ++i)
+        {
+            errors[i] = ds18b20_read_temp(devices[i], &readings[i]);
+        }
+        for (int i = 0; i < num_devices; ++i)
+        {
+            if (errors[i] != DS18B20_OK) ++errors_count[i];
+            printf("  %d: %.1f    %d errors\n", i, readings[i], errors_count[i]);
+        }
+        ds18b20_convert_all(owb);
+        vTaskDelayUntil(&last_wake_time, 1000 / portTICK_PERIOD_MS);
+    }
   }
   else
   {

@@ -8,6 +8,7 @@ float humidity = 65.0;
 extern char *nvs_mySSID;
 extern char *nvs_myPSW;
 extern uint8_t nvs_myID;
+extern float readings[];
 //-------------------------------------------------------------
 #define NUM_RELAYS  5   // Set number of relays
 int relayGPIOs[NUM_RELAYS] = {4, 5, 18, 19, 13};  // Assign each GPIO to a relay
@@ -16,12 +17,12 @@ int relayGPIOs[NUM_RELAYS] = {4, 5, 18, 19, 13};  // Assign each GPIO to a relay
     (strcasecmp(&filename[strlen(filename) - sizeof(ext) + 1], ext) == 0)
 //-------------------------------------------------------------
 float getTemperature(){
-  temperature = temperature + 0.1;
+  temperature = readings[0];
   return temperature;
 }
   
 float getHumidity() {
-  humidity = humidity - 0.1;
+  humidity = readings[1];
   return humidity;
 }
 //-------------------------------------------------------------
