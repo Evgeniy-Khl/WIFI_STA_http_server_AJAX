@@ -66,7 +66,7 @@ void check_post_query(httpd_req_t *req, size_t buf_len)
            char *resp_str = NULL;
            resp_str = (char*) req->user_ctx;
            resp_str = malloc(4);
-           
+           // strncat
            num = strtod(param, &end);
            num = relayGPIOs[num];
            ESP_LOGI(TAG, "Found POST_handler query parameter => GPIO:%u  reg_out=%u", num, reg_out);

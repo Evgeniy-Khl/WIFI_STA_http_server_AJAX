@@ -1,6 +1,13 @@
 # put here your custom config value
 menu "Example Configuration"
 
+config MAX_DEVICES
+  int "MAX DEVICES ds18b20"
+  range 1 3
+  default 2
+  help
+    MAX devices ds18b20.
+
 config LED_GPIO
     int "LED GPIO number"
     range 0 48
