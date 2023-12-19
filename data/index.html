@@ -110,13 +110,13 @@
   <p></p>
   <p id="rcorners1">
     <span class="sensor-labels">Температура</span><br/>
-    <span style="font-size:3.0em;" id="temperature">%TMP%</span>
+    <span style="font-size:3.0em; color:#f2bebb" id="temperature">%tmp%</span>
     <sup class="units">&deg;C</sup>
   </p>
   <p></p>
   <p id="rcorners2">
     <span class="sensor-labels">Влажность</span><br/>
-    <span style="font-size:3.0em" id="humidity">%HUM%</span>
+    <span style="font-size:3.0em; color:#bbdff2" id="humidity">%hum%</span>
     <sup class="units">&#37;</sup>
   </p>
   <p></p>
@@ -143,6 +143,7 @@ function firsload(){
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         document.getElementById("temperature").innerHTML = this.responseText;
+		document.getElementById("temperature").style.color = "black";
       }
     };
     xhttp.open("POST", "index.html?temperature=1", true);	// асинхронний способ
@@ -152,6 +153,7 @@ function firsload(){
 	xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         document.getElementById("humidity").innerHTML = this.responseText;
+		document.getElementById("humidity").style.color = "black";
       }
     };
     xhttp.open("POST", "index.html?humidity=0", true);		// асинхронний способ
